@@ -1,0 +1,46 @@
+<!-- 站点统计增强：仅线上域名显示访问量，本地预览不计数，脚本失败不残留空白 -->
+<script>
+(function () {
+  var HOSTS = ['blog.313270009.xyz', 'ljy313270009.github.io'];
+  var box = document.querySelector('.busuanzi-count');
+  if (!box) return;
+
+  // 本地预览时的计数属于 localhost 域名，没有意义，直接移除避免数字混淆
+  if (HOSTS.indexOf(location.hostname) === -1) {
+    if (box.parentNode) box.parentNode.removeChild(box);
+    return;
+  }
+
+  var finished = false;
+
+  function decorate(wrap, prefix, suffix) {
+    if (!wrap) return;
+    wrap.insertBefore(document.createTextNode(prefix), wrap.firstChild);
+    wrap.appendChild(document.createTextNode(suffix));
+  }
+
+  function tryDecorate() {
+    var uv = document.getElementById('busuanzi_value_site_uv');
+    var pv = document.getElementById('busuanzi_value_site_pv');
+    if (!uv || !pv || !uv.innerHTML || !pv.innerHTML) return false;
+    decorate(uv.parentNode, '本站访客数 ', ' 人');
+    decorate(pv.parentNode, '本站总访问量 ', ' 次');
+    return true;
+  }
+
+  var waited = 0;
+  var timer = setInterval(function () {
+    waited += 1;
+    if (tryDecorate()) {
+      finished = true;
+      clearInterval(timer);
+      return;
+    }
+    // 统计脚本超时（被防火墙/广告拦截/网络不通）时移除空白容器
+    if (waited > 40) {
+      clearInterval(timer);
+      if (!finished && box.parentNode) box.parentNode.removeChild(box);
+    }
+  }, 250);
+})();
+</script>
