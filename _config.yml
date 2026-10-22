@@ -4,9 +4,9 @@
 
 # Site
 title: 海阔天空
-subtitle: ''
+subtitle: '技术 · 交易 · 思考'
 description: '记录与分享一些实用的内容'
-keywords: '博客, 技术, 分享'
+keywords: 'Hexo, 博客, 建站, 量化交易, 投机, 技术分享'
 author: ljy313270009
 language: zh-CN
 timezone: 'Asia/Shanghai'
@@ -45,7 +45,7 @@ external_link:
   exclude: ''
 filename_case: 0
 render_drafts: false
-post_asset_folder: false
+post_asset_folder: true
 relative_link: false
 future: true
 syntax_highlighter: highlight.js
