@@ -1,0 +1,9 @@
+// 强制 GitHub 关注横幅固定在右上角
+// 主题默认未给 .github-corner 锚点设 position，会随布局漂移（如 Gemini 双栏下跑到左下角）
+.github-corner {
+  position: fixed !important;
+  top: 0;
+  right: 0;
+  z-index: 1050;
+  border: 0;
+}
