@@ -74,10 +74,10 @@ creative_commons:
   # Available values: big | small
   size: small
   sidebar: false
-  post: false
+  post: true
   # You can set a language value if you prefer a translated version of CC license, e.g. deed.zh
   # CC licenses are available in 39 languages, you can find the specific and correct abbreviation you need on https://creativecommons.org
-  language:
+  language: deed.zh
 
 # Open graph settings
 # See: https://hexo.io/docs/helpers#open-graph
@@ -252,7 +252,7 @@ excerpt_description: false
 # Automatically Excerpt. Not recommend.
 # Please use <!-- more --> in the article to get the best effect.
 auto_excerpt:
-  enable: true
+  enable: false
   length: 300
 
 # Read more button
@@ -422,8 +422,8 @@ bookmark:
 
 # `Follow me on GitHub` banner in the top-right corner.
 github_banner:
-  enable: false
-  permalink: https://github.com/yourname
+  enable: true
+  permalink: https://github.com/ljy313270009
 
 
 # ---------------------------------------------------------------
