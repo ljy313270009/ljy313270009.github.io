@@ -251,9 +251,10 @@ excerpt_description: false
 
 # Automatically Excerpt. Not recommend.
 # Please use <!-- more --> in the article to get the best effect.
-auto_excerpt:
-  enable: false
-  length: 300
+# auto_excerpt: NexT 8 已移除该字段（不生效），首页预览改用文章内 <!-- more --> 断点
+# auto_excerpt:
+#   enable: false
+#   length: 300
 
 # Read more button
 # If true, the read more button will be displayed in excerpt section.
