@@ -56,7 +56,7 @@ git --version
 npm config set registry https://registry.npmmirror.com
 ```
 
-**注册**：GitHub 账号、Cloudflare 账号，再准备一个域名（阿里云、腾讯云、Namesilo 都行，最便宜的 `.xyz` / `.top` 十几块一年）。
+**注册**：GitHub 账号、Cloudflare 账号，再准备一个域名（阿里云、[腾讯云](https://curl.qcloud.com/lxNLjrln)、Namesilo 都行，最便宜的 `.xyz` / `.top` 十几块一年）。域名和服务器都可以 [点此注册腾讯云](https://curl.qcloud.com/lxNLjrln) 一站搞定，新用户有专属优惠。
 
 ## 二、本地把博客跑起来
 
