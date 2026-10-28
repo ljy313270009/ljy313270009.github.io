@@ -1,7 +1,7 @@
 ---
 title: 美区 Apple ID 注册教程（2026 实测）：国内手机号 + 免费 iCloud 邮箱，全程不绑卡
 categories:
-  - 技术
+  - 技术分享
   - iOS
 tags:
   - Apple ID

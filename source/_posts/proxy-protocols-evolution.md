@@ -1,7 +1,7 @@
 ---
 title: 翻墙协议进化简史：从 Shadowsocks 到 REALITY / Hysteria 2
 categories:
-  - 技术
+  - 技术分享
   - 网络与协议
 tags:
   - 代理协议
