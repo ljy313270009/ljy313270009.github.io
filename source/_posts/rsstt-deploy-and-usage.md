@@ -1,8 +1,8 @@
 ---
 title: 自建 Telegram RSS 机器人：RSStT 部署与使用完整指南
 categories:
-  - 自建服务
-  - 效率工具
+  - 技术
+  - 自建与部署
 tags:
   - RSS
   - Telegram

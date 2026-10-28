@@ -1,7 +1,7 @@
 ---
 title: Freqtrade 是什么？一个开源加密货币量化框架的完整拆解
 categories:
-  - 加密货币
+  - 交易与投机
   - 量化交易
 tags:
   - Freqtrade
