@@ -1,6 +1,6 @@
 ---
 title: 策略三 · 双向通道突破 + 双层止损
-date: 2026-10-30 11:30:00
+date: 2026-10-30 11:33:00
 categories: [量化交易, 策略分享]
 tags: [Freqtrade, 通道突破, 唐奇安, 趋势跟踪, 双向]
 abbrlink: 1ea5e23

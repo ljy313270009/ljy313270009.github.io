@@ -1,6 +1,6 @@
 ---
 title: 策略六 · 均线 + K 线形态（固定盈亏比）
-date: 2026-10-30 11:30:00
+date: 2026-10-30 11:36:00
 categories: [量化交易, 策略分享]
 tags: [Freqtrade, K线形态, 均线, 盈亏比, 只做多]
 abbrlink: 39af82c
