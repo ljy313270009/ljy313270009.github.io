@@ -10,6 +10,9 @@
 
   var API = '/api/count';
   var UV_FLAG = '_my_uv=1';
+  // 白名单：仅这些域名才显示统计。以后新增子域名（如 shop.313270009.xyz），
+  // 只需在此数组加一项，并确保该子域名已加 CF 路由 <sub>.313270009.xyz/api/* → site-counter。
+  // 计数后端按 hostname 隔离，各子域名统计互不串味。
   var HOSTS = ['blog.313270009.xyz', 'ljy313270009.github.io'];
 
   function el(id) { return document.getElementById(id); }
