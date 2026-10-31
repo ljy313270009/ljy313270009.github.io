@@ -10,10 +10,13 @@
 
   var API = '/api/count';
   var UV_FLAG = '_my_uv=1';
-  // 白名单：仅这些域名才显示统计。以后新增子域名（如 shop.313270009.xyz），
-  // 只需在此数组加一项，并确保该子域名已加 CF 路由 <sub>.313270009.xyz/api/* → site-counter。
-  // 计数后端按 hostname 隔离，各子域名统计互不串味。
-  var HOSTS = ['blog.313270009.xyz', 'ljy313270009.github.io'];
+  // 放行规则：本站主域 313270009.xyz 下的任意子域名（blog / shop / www / ...）均显示统计，
+  // 再加上 GitHub Pages 默认域名。新增子域名无需改这里，只要该子域名已加 CF 路由
+  // <sub>.313270009.xyz/api/* → site-counter 即可。计数后端按 hostname 隔离，各子域名互不串味。
+  function isAllowedHost(host) {
+    if (host === 'ljy313270009.github.io') return true;
+    return host === '313270009.xyz' || host.endsWith('.313270009.xyz');
+  }
 
   function el(id) { return document.getElementById(id); }
 
@@ -40,8 +43,8 @@
 
   var box = document.querySelector('.busuanzi-count');
 
-  // 本地预览（localhost 等）不显示统计，避免无意义数字
-  if (!box || HOSTS.indexOf(location.hostname) === -1) {
+  // 本地预览（localhost 等）或不在放行域名内，不显示统计
+  if (!box || !isAllowedHost(location.hostname)) {
     if (box && box.parentNode) box.parentNode.removeChild(box);
     return;
   }
@@ -62,28 +65,28 @@
     req('action=get&type=site_uv', function (v) { setText('busuanzi_value_site_uv', v); });
   }
 
-  // ---- 数据填好后加中文标签；超时未取到则移除容器 ----
+  // ---- 数据填好后加中文标签；任一指标取到即保留容器，全失败才移除 ----
   function decorate(wrap, prefix, suffix) {
     if (!wrap) return;
     wrap.insertBefore(document.createTextNode(prefix), wrap.firstChild);
     wrap.appendChild(document.createTextNode(suffix));
   }
 
-  var waited = 0;
+  var waited = 0, uvDone = false, pvDone = false;
   var timer = setInterval(function () {
     waited += 1;
     var uv = el('busuanzi_value_site_uv');
     var pv = el('busuanzi_value_site_pv');
-    if (uv && pv && uv.textContent && pv.textContent &&
-        uv.textContent !== '-' && pv.textContent !== '-') {
-      decorate(uv.parentNode, '本站访客数 ', ' 人');
-      decorate(pv.parentNode, '本站总访问量 ', ' 次');
-      clearInterval(timer);
-      return;
+    if (uv && uv.textContent && uv.textContent !== '-' && !uvDone) {
+      decorate(uv.parentNode, '本站访客数 ', ' 人'); uvDone = true;
     }
-    if (waited > 40) {
+    if (pv && pv.textContent && pv.textContent !== '-' && !pvDone) {
+      decorate(pv.parentNode, '本站总访问量 ', ' 次'); pvDone = true;
+    }
+    if ((uvDone && pvDone) || waited > 40) {
       clearInterval(timer);
-      if (box.parentNode) box.parentNode.removeChild(box);
+      // 一个都没取到才移除容器，避免单点请求失败导致整块消失
+      if (!uvDone && !pvDone && box.parentNode) box.parentNode.removeChild(box);
     }
   }, 250);
 })();
