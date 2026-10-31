@@ -1,5 +1,5 @@
 /**
- * 自托管访客统计 · Cloudflare Worker
+ * 自托管访客统计 · Cloudflare Worker（经典 Service Worker 格式，兼容性最好）
  *
  * 部署步骤（在 Cloudflare 面板）：
  * 1. 建一个 KV namespace，记下它的 ID
@@ -18,35 +18,38 @@
  * 返回：{ "type": "...", "value": 123 }
  */
 
-export default {
-  async fetch(request, env, ctx) {
-    const url = new URL(request.url);
-    const type = url.searchParams.get('type');       // site_pv | page_pv | site_uv
-    const action = url.searchParams.get('action');   // hit | get
-    const path = url.searchParams.get('path') || '/';
+addEventListener('fetch', (event) => {
+  event.respondWith(handleRequest(event));
+});
 
-    if (!type) {
-      return new Response(JSON.stringify({ error: 'missing type' }), {
-        status: 400,
-        headers: { 'content-type': 'application/json' }
-      });
-    }
+async function handleRequest(event) {
+  const request = event.request;
+  const url = new URL(request.url);
+  const type = url.searchParams.get('type');       // site_pv | page_pv | site_uv
+  const action = url.searchParams.get('action');   // hit | get
+  const path = url.searchParams.get('path') || '/';
 
-    // 页面 PV 按路径区分；站点 PV / UV 用固定 key
-    const key = type === 'page_pv' ? 'pv:' + path : type;
-    let val = parseInt(await env.COUNTER.get(key) || '0', 10);
-
-    if (action === 'hit') {
-      val += 1;
-      // 异步写回，不阻塞响应
-      ctx.waitUntil(env.COUNTER.put(key, String(val)));
-    }
-
-    return new Response(JSON.stringify({ type, value: val }), {
-      headers: {
-        'content-type': 'application/json',
-        'cache-control': 'no-store'
-      }
+  if (!type) {
+    return new Response(JSON.stringify({ error: 'missing type' }), {
+      status: 400,
+      headers: { 'content-type': 'application/json' }
     });
   }
-};
+
+  // 页面 PV 按路径区分；站点 PV / UV 用固定 key
+  const key = type === 'page_pv' ? 'pv:' + path : type;
+  let val = parseInt(await COUNTER.get(key) || '0', 10);
+
+  if (action === 'hit') {
+    val += 1;
+    // 异步写回，不阻塞响应
+    event.waitUntil(COUNTER.put(key, String(val)));
+  }
+
+  return new Response(JSON.stringify({ type, value: val }), {
+    headers: {
+      'content-type': 'application/json',
+      'cache-control': 'no-store'
+    }
+  });
+}
