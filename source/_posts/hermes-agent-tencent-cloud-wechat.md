@@ -59,13 +59,7 @@ Hermes Agent **不支持 Windows 原生环境**。Windows 用户想跑在自己�
 ## 二、第一步：注册腾讯云
 
 {% note success %}
-**注册入口（点击即可）**
-
-<div align="center" style="margin: 0.8em 0;">
-  <a href="https://curl.qcloud.com/lxNLjrln" target="_blank" rel="noopener" style="display:inline-block;padding:0.7em 1.8em;background:#006eff;color:#fff;border-radius:6px;text-decoration:none;font-weight:600;">点此注册腾讯云</a>
-</div>
-
-<span style="font-size:0.9em;color:#888;">通过该链接注册可享腾讯云新用户专属优惠。注册后记得完成实名认证——买服务器必须要实名。</span>
+注册腾讯云账号（官网即可注册），注册后记得完成实名认证——买服务器必须要实名。
 {% endnote %}
 
 ## 三、第二步：把 Hermes Agent 装到服务器上
@@ -74,7 +68,7 @@ Hermes Agent **不支持 Windows 原生环境**。Windows 用户想跑在自己�
 
 ### 方式一：新购一台（推荐）
 
-还没有腾讯云账号？先 [点此注册腾讯云](https://curl.qcloud.com/lxNLjrln)（新用户有专属优惠），完成实名认证后进 [轻量应用服务器购买页](https://console.cloud.tencent.com/lighthouse/instance/index) 下单。
+还没有腾讯云账号？先去官网注册，完成实名认证后进 [轻量应用服务器购买页](https://console.cloud.tencent.com/lighthouse/instance/index) 下单。
 
 | 选项 | 怎么选 | 说明 |
 |---|---|---|
