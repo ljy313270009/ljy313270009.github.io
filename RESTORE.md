@@ -67,3 +67,47 @@ git push origin main         # 触发 GitHub Pages 重建，线上即最新
 - 访客统计：`site-counter` Worker + `COUNTER` KV（见第 4 节）。
 - 其他 GitHub 联动项目若走 Cloudflare Pages / Workers，部署与配置变更也在此账户下由助手操作。
 - 密钥轮换：API Token 在 Cloudflare 控制台「My Profile → API Tokens」可随时吊销重建，助手续接时只需重提供新 token。
+
+## 7. 博客更新发布全流程（GitHub + Cloudflare）
+
+> 这是"用 GitHub + Cloudflare 更新博客"的完整链路。**日常发文章只动 GitHub，完全不用碰 Cloudflare**；Cloudflare 只在域名/代理/访客统计层面工作。
+
+### 7.1 整体架构（先理解链路，才知道每一步在干嘛）
+
+| 角色 | 负责什么 |
+|---|---|
+| **GitHub** | 源码仓库 `ljy313270009.github.io` + CI 构建部署。Push 到 `main` 触发 Actions：`checkout → Node 24 → npm install → npm run build（= hexo generate）→ 上传 public → 部署到 GitHub Pages`。 |
+| **GitHub Pages** | 实际托管静态站点的地方；仓库 Pages 设置里 CNAME = `blog.313270009.xyz`。 |
+| **Cloudflare** | 在 GitHub Pages 前面做三件事：① DNS（自定义域名）→ ② CDN / SSL / 加速（橙色代理）→ ③ `site-counter` Worker（`*.313270009.xyz/api/*` 路由）做访客统计。 |
+
+一句话：**GitHub 负责"改源码 + 构建上线"，Cloudflare 负责"把自定义域名安全地、加速地递给访客"。**
+
+### 7.2 标准更新流程（日常发文章 / 改配置）
+
+```bash
+cd D:/Hexo
+# 1) 改内容：编辑 source/_posts/*.md（或 _config.yml / 主题）
+# 2) 本地预览（可选）：npx hexo s          # http://127.0.0.1:4000
+# 3) 本地构建验证（可选）：npx hexo clean && npx hexo g
+# 4) 提交并推送
+git add . && git commit -m "..." && git push origin main
+```
+
+推送后 GitHub Actions 约 1 分钟构建并部署到 GitHub Pages；Cloudflare 随即经 `blog.313270009.xyz` 把新内容递给访客（CDN 缓存刷新）。**本地和 Cloudflare 都不需要额外操作。**
+
+### 7.3 关键事实（排错 / 接手用）
+
+- CI 固定 **Node 24**（`pages.yml` 写死），本机保持 Node 24 与线上一致；旧机/沙盒 Node 22 也能 `hexo g`，仅版本略有差异。
+- `npm run build` ≡ `hexo generate`（见 `package.json` 的 scripts）。
+- 自定义域名走 **CNAME**（`blog.313270009.xyz`），不是 Apex `custom_domain`。Cloudflare 对该域名开**代理（orange cloud）**，故 SSL/HTTPS、缓存、访客统计 Worker 全部由 Cloudflare 接管。
+- 根域 `313270009.xyz` 的 4 条 A 记录也指向 GitHub Pages IP（`185.199.108~111.153`，代理开），所以根域与 `blog` 子域都能访问。
+- 访客统计 Worker `site-counter`：路由 `*.313270009.xyz/api/*`，源码 `cloudflare/counter-worker.js`，绑定 KV `COUNTER`。**只有改它才需要 Cloudflare 权限**（见第 6 节），发文章用不到。
+
+### 7.4 回滚 / 故障
+
+- 若新内容导致 Actions 构建失败，工作流会标红；在本地 `git revert` 上次提交并重新 `push` 即可回到上一个可部署状态，Cloudflare 侧无需操作。
+- 若线上未更新：先看 Actions 是否跑完（约 1 分钟）；再看 Cloudflare 该域名是否仍"代理开"且 CNAME 指向 `ljy313270009.github.io`。
+
+### 7.5 可选：将来切换到 Cloudflare Pages 直部署
+
+当前是"GitHub Pages + Cloudflare 代理"。若想改为"Cloudflare Pages 直接从本仓库构建部署"（少一层 GitHub Pages），可新建 Cloudflare Pages 项目并关联 `ljy313270009.github.io` 仓库（构建命令 `npm run build`、输出目录 `public`），再让 Cloudflare 接管域名。需要的话让助手操作（涉及切换托管方式，会先与你确认）。
