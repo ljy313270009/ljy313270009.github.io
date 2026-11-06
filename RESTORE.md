@@ -33,5 +33,37 @@ npx hexo server      # 本地预览 http://127.0.0.1:4000
 
 ## 4. 与本地无关的东西（重装不受影响）
 
-- **访客统计后端**：Cloudflare Worker `site-counter` + KV + 路由 `*.313270009.xyz/api/*`，全在 CF 云端。前端 `source/js/my-counter.js` 与 `source/_data/footer-inject.njk` 的容器 ID 勿改。
-- 要改动 Worker/KV 时需要 Cloudflare API Token（自存，仓库不含密钥）。
+- **访客统计后端**：Cloudflare Worker `site-counter` + KV（变量名 `COUNTER`）+ 路由 `<sub>.313270009.xyz/api/*`，全在 CF 云端。源码在 `cloudflare/counter-worker.js`，部署/改动用 `wrangler`。前端 `source/js/my-counter.js` 与 `source/_data/footer-inject.njk` 的容器 ID 勿改。
+- 改动 Worker/KV/DNS 等需要 Cloudflare API Token（自存于本地凭据管理器，仓库不含密钥）。详见第 5 节。
+
+## 5. Next 主题更新流程（本地驱动，推荐）
+
+> 策略：保持 `package.json` 里 `"hexo-theme-next": "^8.29.0"` 不变（只锁 8.x 大版本，不会跳到 9.0），每次只更新 `package-lock.json` 到最新 8.x。Dependabot 已对 `hexo-theme-next` 设 `ignore`，不再开 PR，改由本地驱动更新。
+
+**更新主题（让本地与线上都跟到最新 8.x）：**
+
+```bash
+cd D:/Hexo
+npm update hexo-theme-next   # 仅升级锁文件到最新 8.x
+npm install                  # 按新锁文件重装
+npx hexo clean && npx hexo g # 全量重建，验证新主题可正常构建
+git add package-lock.json    # 只提交锁文件（package.json 通常不变）
+git commit -m "chore: 更新 hexo-theme-next 至 x.y.z"
+git push origin main         # 触发 GitHub Pages 重建，线上即最新
+```
+
+要点：
+- 推送 `main` 即触发 Pages 自动部署，无需本地发版。
+- **跨大版本（如 8.x → 9.0）有 breaking change，必须人工确认后再做**；本流程默认只跟 8.x。
+- CI（`pages.yml`）用的是 **Node 24**，本机保持 Node 24 可与线上构建环境一致（Node 22 也能 `hexo g`，仅版本略差）。
+- 查看当前安装版本：`node -p "require('hexo-theme-next/package.json').version"`。
+
+## 6. Cloudflare 资源管理（由助手维护）
+
+> 博客及你多个项目用 GitHub + Cloudflare 部署。Cloudflare 侧资源（DNS、Worker、KV、Pages、R2 等）由助手通过 API Token + `wrangler` 管理，密钥不在仓库内。
+
+- 账户：`ljy313270009`（登录邮箱 `ljy313270009@gmail.com`，与 GitHub 一致）。
+- 域名 Zone：`313270009.xyz`（含 blog/shop 等子域），DNS 记录与子域路由在此管理。
+- 访客统计：`site-counter` Worker + `COUNTER` KV（见第 4 节）。
+- 其他 GitHub 联动项目若走 Cloudflare Pages / Workers，部署与配置变更也在此账户下由助手操作。
+- 密钥轮换：API Token 在 Cloudflare 控制台「My Profile → API Tokens」可随时吊销重建，助手续接时只需重提供新 token。
