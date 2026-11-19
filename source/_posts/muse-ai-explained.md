@@ -1,14 +1,7 @@
 ---
 title: Muse 是什么？Meta 面向所有人的个人 AI 智能体完整拆解
-categories:
-  - 技术分享
-  - AI智能体
-tags:
-  - Muse
-  - Meta
-  - AI智能体
-  - 个人助理
-  - 人工智能
+categories: [技术分享, 产品拆解]
+tags: [Muse, Meta, AI智能体, 个人助理, 人工智能]
 description: >-
   拆解 Meta 个人 AI 智能体 Muse：不止回答问题、替你把活干完的定位，Muse Secure VM 与 Sentinel
   审批的架构设计，购物、邮件、行程等能力边界，隐私争议与上手授权建议。

@@ -1,14 +1,8 @@
 ---
 title: 从零开始：用 Hexo + GitHub + Cloudflare 搭一个自己的博客
 date: 2026-10-21 15:00:00
-categories:
-  - 技术分享
-  - 自建与部署
-tags:
-  - Hexo
-  - GitHub Actions
-  - Cloudflare
-  - 建站
+categories: [技术分享, 自建与部署]
+tags: [Hexo, GitHub Actions, Cloudflare, 建站]
 description: 写给完全新手的 Hexo 建站记录 —— 从本地搭建、GitHub Actions 自动部署，到 Cloudflare 绑定自有域名上线的全过程，外加一路踩过的坑。
 toc: true
 abbrlink: 55f5c54d

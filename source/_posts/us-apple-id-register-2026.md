@@ -1,14 +1,7 @@
 ---
 title: 美区 Apple ID 注册教程（2026 实测）：国内手机号 + 免费 iCloud 邮箱，全程不绑卡
-categories:
-  - 技术分享
-  - iOS
-tags:
-  - Apple ID
-  - 美区账号
-  - iOS
-  - App Store
-  - 教程
+categories: [技术分享, 实用教程]
+tags: [Apple ID, 美区账号, iOS, App Store, 教程]
 description: 不用美国手机号、不用买号、不用绑卡：拔 SIM + 改语言地区 + 国内 +86 收短信，八步注册出美区 Apple ID。含成功判据、其他区通用方法、充值避坑与九条排错。
 abbrlink: b3d7a05e
 date: 2026-10-28 15:10:00

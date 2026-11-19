@@ -1,14 +1,7 @@
 ---
 title: 腾讯云轻量服务器部署 Hermes Agent 并接入微信（小白完整教程）
-categories:
-  - 技术分享
-  - 自建与部署
-tags:
-  - Hermes Agent
-  - 腾讯云
-  - 微信
-  - AI Agent
-  - 轻量应用服务器
+categories: [技术分享, 自建与部署]
+tags: [Hermes Agent, 腾讯云, 微信, AI Agent, 轻量应用服务器]
 description: 全程不碰命令行：注册腾讯云、买轻量应用服务器、选 Hermes Agent 应用镜像、在控制台「应用管理」面板里配模型、点「授权接入」扫码连微信、装 SkillHub 技能，附常见问题与成本安全提醒。
 abbrlink: 4b8d1e02
 date: 2026-10-27 21:00:00

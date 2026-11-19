@@ -1,14 +1,7 @@
 ---
 title: Freqtrade 是什么？一个开源加密货币量化框架的完整拆解
-categories:
-  - 量化交易
-  - 开源项目
-tags:
-  - Freqtrade
-  - 量化交易
-  - 加密货币
-  - 开源项目
-  - 策略回测
+categories: [量化交易, 工具拆解]
+tags: [Freqtrade, 量化交易, 加密货币, 开源项目, 策略回测]
 description: 从架构到流水线，详细拆解开源加密货币量化交易框架 Freqtrade：策略接口、数据层、回测、超参优化、风控与实盘模式，并说明它的适用边界。
 abbrlink: 3db4ddb9
 date: 2026-10-22 14:30:00

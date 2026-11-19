@@ -1,14 +1,7 @@
 ---
 title: 自建 Telegram RSS 机器人：RSStT 部署与使用完整指南
-categories:
-  - 技术分享
-  - 自建与部署
-tags:
-  - RSS
-  - Telegram
-  - 自建服务
-  - Docker
-  - 开源项目
+categories: [技术分享, 自建与部署]
+tags: [RSS, Telegram, 自建服务, Docker, 开源项目]
 description: 从零部署开源项目 RSStT（RSS to Telegram Bot）：准备 Bot Token、管理员 ID 与 Telegraph Token，用 Docker Compose 起服务，详解必填与常用环境变量、全部订阅命令、订阅设置项，以及常见踩坑与维护要点。
 abbrlink: 2f6bc904
 date: 2026-10-27 17:00:00

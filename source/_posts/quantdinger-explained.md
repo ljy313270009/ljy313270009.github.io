@@ -1,15 +1,7 @@
 ---
 title: QuantDinger 是什么？一个本地优先的开源 AI 交易操作系统完整拆解
-categories:
-  - 量化交易
-  - 开源项目
-tags:
-  - QuantDinger
-  - AI交易
-  - 量化交易
-  - 开源项目
-  - 自托管
-  - 加密货币
+categories: [量化交易, 工具拆解]
+tags: [QuantDinger, AI交易, 量化交易, 开源项目, 自托管, 加密货币]
 description: >-
   从架构到流水线和盘拆解开源 AI 交易操作系统 QuantDinger：本地优先的自托管设计、AI 研究→策略→回测→模拟/实盘全链路、JEV 盘前决策门与
   MCP/Agent 接口，并说清它的适用边界。
