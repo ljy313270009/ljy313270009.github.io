@@ -185,8 +185,6 @@ links_settings:
   layout: block
 
 links:
-  AkileCloud: "https://akile.ai/register?aff_code=55ee17fc-849b-4bba-a70f-12f201f1dd1a"
-  币安: "https://www.bsmkweb.cc/register?ref=82606034"
 
 # Table of Contents in the Sidebar
 # Front-matter variable (nonsupport wrap expand_all).
