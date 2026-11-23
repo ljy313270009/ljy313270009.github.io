@@ -33,8 +33,8 @@ npx hexo server      # 本地预览 http://127.0.0.1:4000
 
 ## 4. 与本地无关的东西（重装不受影响）
 
-- **访客统计后端**：Cloudflare Worker `site-counter` + KV（变量名 `COUNTER`）+ 路由 `<sub>.313270009.xyz/api/*`，全在 CF 云端。源码在 `cloudflare/counter-worker.js`，部署/改动用 `wrangler`。前端 `source/js/my-counter.js` 与 `source/_data/footer-inject.njk` 的容器 ID 勿改。
-- 改动 Worker/KV/DNS 等需要 Cloudflare API Token（自存于本地凭据管理器，仓库不含密钥）。详见第 5 节。
+- **访客统计**：Cloudflare Web Analytics（官方统计），页脚 `source/_data/footer-inject.njk` 只含官方 beacon 脚本，数据在 Cloudflare 控制台 Analytics → Web Analytics 查看，站点页面上不显示数字。（自建计数器 Worker/KV 已于 2026-11-23 删除。）
+- 改动 DNS/Pages/安全设置等需要 Cloudflare API Token（自存于本地凭据管理器，仓库不含密钥）。详见第 6 节。
 
 ## 5. Next 主题更新流程（本地驱动，推荐）
 
@@ -49,38 +49,40 @@ npm install                  # 按新锁文件重装
 npx hexo clean && npx hexo g # 全量重建，验证新主题可正常构建
 git add package-lock.json    # 只提交锁文件（package.json 通常不变）
 git commit -m "chore: 更新 hexo-theme-next 至 x.y.z"
-git push origin main         # 触发 GitHub Pages 重建，线上即最新
+git push origin main         # 触发 Cloudflare Pages 重建，线上即最新
 ```
 
 要点：
 - 推送 `main` 即触发 Pages 自动部署，无需本地发版。
 - **跨大版本（如 8.x → 9.0）有 breaking change，必须人工确认后再做**；本流程默认只跟 8.x。
-- CI（`pages.yml`）用的是 **Node 24**，本机保持 Node 24 可与线上构建环境一致（Node 22 也能 `hexo g`，仅版本略差）。
+- 线上构建（Cloudflare Pages）用的是 **Node 24**，本机保持 Node 24 可与线上构建环境一致（Node 22 也能 `hexo g`，仅版本略差）。
 - 查看当前安装版本：`node -p "require('hexo-theme-next/package.json').version"`。
 
 ## 6. Cloudflare 资源管理（由助手维护）
 
-> 博客及你多个项目用 GitHub + Cloudflare 部署。Cloudflare 侧资源（DNS、Worker、KV、Pages、R2 等）由助手通过 API Token + `wrangler` 管理，密钥不在仓库内。
+> 博客托管与域名都在 Cloudflare。Cloudflare 侧资源（DNS、Pages、安全设置等）由助手通过 API Token 管理，密钥不在仓库内。
 
 - 账户：`ljy313270009`（登录邮箱 `ljy313270009@gmail.com`，与 GitHub 一致）。
-- 域名 Zone：`313270009.xyz`（含 blog/shop 等子域），DNS 记录与子域路由在此管理。
-- 访客统计：`site-counter` Worker + `COUNTER` KV（见第 4 节）。
-- 其他 GitHub 联动项目若走 Cloudflare Pages / Workers，部署与配置变更也在此账户下由助手操作。
+- 域名 Zone：`313270009.xyz`，DNS 在此管理；已开启 DNSSEC、最低 TLS 1.2、HSTS（试行中，max-age 1 天）、Early Hints，并拦截 AI 训练爬虫。
+- 托管：Pages 项目 `blog`，关联本仓库 `main` 分支自动构建部署（构建命令 `npm run build`，输出 `public`，Node 24）。自定义域名 `blog.313270009.xyz`；根域 `313270009.xyz` 由重定向规则 301 跳转到 blog 子域（保留路径与查询串）。
+- 访客统计：Cloudflare Web Analytics（官方统计，页脚 beacon 注入，数据在控制台查看）。自建计数器（`site-counter` Worker + `COUNTER` KV）已于 2026-11-23 删除。
+- 备份：每周日约 21:00 自动把仓库核心内容打包备份到 Google Drive「Muse 工作文档备份」，保留最新 4 份。
+- 同账户下另有与博客无关的 Worker：`edgetunnel`（fq 子域）、`tgproxy`（tg 子域）。
 - 密钥轮换：API Token 在 Cloudflare 控制台「My Profile → API Tokens」可随时吊销重建，助手续接时只需重提供新 token。
 
-## 7. 博客更新发布全流程（GitHub + Cloudflare）
+## 7. 博客更新发布全流程（GitHub + Cloudflare Pages）
 
-> 这是"用 GitHub + Cloudflare 更新博客"的完整链路。**日常发文章只动 GitHub，完全不用碰 Cloudflare**；Cloudflare 只在域名/代理/访客统计层面工作。
+> **日常发文章只动 GitHub**：push 到 `main` 后 Cloudflare Pages 自动构建部署，约 1 分钟上线。Cloudflare 控制台平时不用碰。
 
 ### 7.1 整体架构（先理解链路，才知道每一步在干嘛）
 
 | 角色 | 负责什么 |
 |---|---|
-| **GitHub** | 源码仓库 `ljy313270009.github.io` + CI 构建部署。Push 到 `main` 触发 Actions：`checkout → Node 24 → npm install → npm run build（= hexo generate）→ 上传 public → 部署到 GitHub Pages`。 |
-| **GitHub Pages** | 实际托管静态站点的地方；仓库 Pages 设置里 CNAME = `blog.313270009.xyz`。 |
-| **Cloudflare** | 在 GitHub Pages 前面做三件事：① DNS（自定义域名）→ ② CDN / SSL / 加速（橙色代理）→ ③ `site-counter` Worker（`*.313270009.xyz/api/*` 路由）做访客统计。 |
+| **GitHub** | 只存源码仓库 `ljy313270009.github.io`，不再托管站点（原 GitHub Pages 与 Actions 工作流已停用并删除）。 |
+| **Cloudflare Pages** | 项目 `blog` 关联仓库 `main`：每次 push 自动安装依赖 → `npm run build`（= hexo generate）→ 部署 `public`，同时提供托管与 CDN。 |
+| **Cloudflare DNS** | `blog.313270009.xyz` 的 CNAME 指向 Pages（代理开）；根域 301 跳转到 blog 子域；SSL 与安全设置在 Zone 层（见第 6 节）。 |
 
-一句话：**GitHub 负责"改源码 + 构建上线"，Cloudflare 负责"把自定义域名安全地、加速地递给访客"。**
+一句话：**GitHub 管源码，Cloudflare 管构建、托管和域名。**
 
 ### 7.2 标准更新流程（日常发文章 / 改配置）
 
@@ -93,21 +95,24 @@ cd D:/Hexo
 git add . && git commit -m "..." && git push origin main
 ```
 
-推送后 GitHub Actions 约 1 分钟构建并部署到 GitHub Pages；Cloudflare 随即经 `blog.313270009.xyz` 把新内容递给访客（CDN 缓存刷新）。**本地和 Cloudflare 都不需要额外操作。**
+推送后 Cloudflare Pages 约 1 分钟自动构建并部署上线，成败看 Pages 项目 `blog` 的部署列表。**本地和 Cloudflare 控制台都不需要额外操作。**
 
 ### 7.3 关键事实（排错 / 接手用）
 
-- CI 固定 **Node 24**（`pages.yml` 写死），本机保持 Node 24 与线上一致；旧机/沙盒 Node 22 也能 `hexo g`，仅版本略有差异。
+- 构建环境 **Node 24**（Pages 项目环境变量 `NODE_VERSION=24` 固定），本机保持 Node 24 与线上一致。
 - `npm run build` ≡ `hexo generate`（见 `package.json` 的 scripts）。
-- 自定义域名走 **CNAME**（`blog.313270009.xyz`），不是 Apex `custom_domain`。Cloudflare 对该域名开**代理（orange cloud）**，故 SSL/HTTPS、缓存、访客统计 Worker 全部由 Cloudflare 接管。
-- 根域 `313270009.xyz` 的 4 条 A 记录也指向 GitHub Pages IP（`185.199.108~111.153`，代理开），所以根域与 `blog` 子域都能访问。
-- 访客统计 Worker `site-counter`：路由 `*.313270009.xyz/api/*`，源码 `cloudflare/counter-worker.js`，绑定 KV `COUNTER`。**只有改它才需要 Cloudflare 权限**（见第 6 节），发文章用不到。
+- 自定义域名 `blog.313270009.xyz`（CNAME → `haikuo-blog.pages.dev`，代理开）；Pages 项目改名不改变 pages.dev 子域。
+- 根域 `313270009.xyz` 用占位 A 记录 + 重定向规则 301 到 blog 子域。
+- 404 页：仓库 `source/404.html`，Pages 原生返回真实 404 状态。
+- 站内搜索与 RSS 在构建时生成：`/search.xml`（hexo-generator-searchdb，配置在 `_config.yml` 的 `search` 段）、`/atom.xml`（hexo-generator-feed）。
+- 安全响应头：`source/_headers`（Pages 原生支持；`_config.yml` 的 `include` 含 `_headers` 才会进构建产物）+ Zone 层的 HSTS 设置。
 
 ### 7.4 回滚 / 故障
 
-- 若新内容导致 Actions 构建失败，工作流会标红；在本地 `git revert` 上次提交并重新 `push` 即可回到上一个可部署状态，Cloudflare 侧无需操作。
-- 若线上未更新：先看 Actions 是否跑完（约 1 分钟）；再看 Cloudflare 该域名是否仍"代理开"且 CNAME 指向 `ljy313270009.github.io`。
+- 构建失败：Pages 保留上一个成功部署继续对外服务，线上不受影响；修好后重新 push 即可。
+- 回滚：Pages 控制台项目 `blog` → 部署列表 → 选旧部署 Rollback；或本地 `git revert` 上次提交后重新 push。
+- 线上未更新：先看 Pages 部署列表是否跑完且成功；再看 DNS 里 blog 的 CNAME 是否仍指向 Pages 且代理开。
 
-### 7.5 可选：将来切换到 Cloudflare Pages 直部署
+### 7.5 历史
 
-当前是"GitHub Pages + Cloudflare 代理"。若想改为"Cloudflare Pages 直接从本仓库构建部署"（少一层 GitHub Pages），可新建 Cloudflare Pages 项目并关联 `ljy313270009.github.io` 仓库（构建命令 `npm run build`、输出目录 `public`），再让 Cloudflare 接管域名。需要的话让助手操作（涉及切换托管方式，会先与你确认）。
+2026-11-22 已从「GitHub Pages 托管 + Cloudflare 代理」切换为 Cloudflare Pages 直部署，本节即按切换后的架构写。如需回退托管：把 DNS 里 blog 的 CNAME 改回 GitHub Pages 并在仓库重新启用 Pages 即可，源码无需改动。
